@@ -58,6 +58,10 @@ def log_retrieval_tsv(path, fold, epoch, samples, retrieval_info, drug_number):
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser()
+    
+    parser.add_argument('--retrieval_mode', default='full', choices=['full', 'baseline', 'retrieval'], help='retrieval mode')
+    parser.add_argument('--top_k', type=int, default=10, help='top_k for retrieval')
+
     parser.add_argument('--k_fold', type=int, default=10, help='k-fold cross validation')
     parser.add_argument('--epochs', type=int, default=1000, help='number of epochs to train')
     parser.add_argument('--lr', type=float, default=1e-4, help='learning rate')
@@ -83,8 +87,8 @@ if __name__ == '__main__':
     args.result_dir = 'Result/' + args.dataset + '/AMNTDDA/'
 
     retrieval_config = {
-        'mode': 'full',
-        'top_k': 10,
+        'mode': args.retrieval_mode,
+        'top_k': args.top_k,
         'query_type': 'mlp',
         'use_gpu': True,
         'index_refresh': 'per_epoch',
