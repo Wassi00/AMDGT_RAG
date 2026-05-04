@@ -87,7 +87,7 @@ def data_processing(data, args):
     dis_mean = (data['dip'] + data['dig']) / 2
 
     drs = np.where(data['drf'] == 0, data['drg'], drs_mean)
-    dis = np.where(data['dip'] == 0, data['dip'], dis_mean)
+    dis = np.where(data['dip'] == 0, data['dig'], dis_mean)
 
     data['drs'] = drs
     data['dis'] = dis
