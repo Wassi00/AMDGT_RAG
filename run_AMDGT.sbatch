@@ -7,7 +7,7 @@
 
 source ~/anaconda3/etc/profile.d/conda.sh
 conda activate torch_gpu
-export CUDA_VISIBLE_DEVICES=1
+export CUDA_VISIBLE_DEVICES=0
 # srun python train_DDA.py --dataset B-dataset --epochs 1000 > output/run_$(date +%Y%m%d_%H%M%S)_B.log
 
 for dataset in B-dataset C-dataset F-dataset; do
