@@ -4,12 +4,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 import dgl
-
-"""
-    Graph Transformer with edge features
-    
-"""
-import dgl
 from model.graph_transformer_layer import GraphTransformerLayer
 
 

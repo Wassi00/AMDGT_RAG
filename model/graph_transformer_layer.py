@@ -6,14 +6,7 @@ import dgl
 import dgl.function as fn
 import numpy as np
 
-"""
-    Graph Transformer Layer
-    
-"""
 
-"""
-    Util functions
-"""
 def src_dot_dst(src_field, dst_field, out_field):
     def func(edges):
         return {out_field: (edges.src[src_field] * edges.dst[dst_field]).sum(-1, keepdim=True)}
@@ -27,9 +20,7 @@ def scaled_exp(field, scale_constant):
     return func
 
 
-"""
-    Single Attention Head
-"""
+
 
 class MultiHeadAttentionLayer(nn.Module):
     def __init__(self, in_dim, out_dim, num_heads, use_bias):
@@ -78,9 +69,7 @@ class MultiHeadAttentionLayer(nn.Module):
     
 
 class GraphTransformerLayer(nn.Module):
-    """
-        Param: 
-    """
+
     def __init__(self, in_dim, out_dim, num_heads, dropout=0.0, layer_norm=False, batch_norm=True, residual=True, use_bias=False):
         super().__init__()
 
