@@ -97,7 +97,8 @@ if __name__ == '__main__':
     }
 
     split_config = {
-        'mode': 'standard',
+        # 'mode': 'standard',
+        'mode': 'cold_start_drug',
     }
 
     args.retrieval_config = retrieval_config
