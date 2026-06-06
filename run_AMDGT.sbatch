@@ -8,7 +8,7 @@
 source ~/anaconda3/etc/profile.d/conda.sh
 conda activate torch_gpu
 export CUDA_VISIBLE_DEVICES=0
-srun python train_DDA.py --dataset F-dataset --retrieval_mode "full" --top_k "10" --epochs 1000 > output/run_$(date +%Y%m%d_%H%M%S)_F_full_10_cold_drug.log
+srun python train_DDA.py --dataset F-dataset --retrieval_mode "full" --top_k 10 --retrieval_heads 4 --retrieval_dropout 0.2 --index_refresh_epochs 5 --epochs 2 > output/run_$(date +%Y%m%d_%H%M%S)_F_full_10_full.log
 
 # for dataset in B-dataset C-dataset F-dataset; do
 #     for mode in full baseline retrieval; do
@@ -24,7 +24,7 @@ srun python train_DDA.py --dataset F-dataset --retrieval_mode "full" --top_k "10
 #     done
 # done
 
-# Push results to GitHub
-# git add .
-# git commit -m "Results from AMDGT training runs - $(date +%Y%m%d_%H%M%S)"
-# git push origin master
+Push results to GitHub
+git add .
+git commit -m "Results from AMDGT training runs - $(date +%Y%m%d_%H%M%S)"
+git push origin master

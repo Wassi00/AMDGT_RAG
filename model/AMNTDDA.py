@@ -2,7 +2,7 @@ import dgl.nn.pytorch
 import torch
 import torch.nn as nn
 from model import gt_net_drug, gt_net_disease
-from model.retrieval_reasoning import RetrievalReasoner
+from model.retrieval_reasoning import DualEntityRetrievalReasoner
 
 device = torch.device('cuda')
 
@@ -14,9 +14,10 @@ class AMNTDDA(nn.Module):
         self.retrieval_config = getattr(args, 'retrieval_config', {})
         self.retrieval_mode = self.retrieval_config.get('mode', 'baseline')
         self.retrieval_top_k = self.retrieval_config.get('top_k', 10)
-        self.retrieval_query_type = self.retrieval_config.get('query_type', 'sum')
         self.retrieval_use_gpu = self.retrieval_config.get('use_gpu', True)
         self.retrieval_refresh = self.retrieval_config.get('index_refresh', 'per_forward')
+        self.retrieval_heads = self.retrieval_config.get('num_heads', 4)
+        self.retrieval_dropout = self.retrieval_config.get('dropout', 0.0)
         self.drug_linear = nn.Linear(300, args.hgt_in_dim)
         self.protein_linear = nn.Linear(320, args.hgt_in_dim)
         self.gt_drug = gt_net_drug.GraphTransformer(device, args.gt_layer, args.drug_number, args.gt_out_dim, args.gt_out_dim,
@@ -52,13 +53,15 @@ class AMNTDDA(nn.Module):
         )
 
         self.retrieval_reasoner = None
-        self.embedding_bank = None
+        self.drug_bank = None
+        self.disease_bank = None
         if self.retrieval_mode != 'baseline':
-            self.retrieval_reasoner = RetrievalReasoner(
+            self.retrieval_reasoner = DualEntityRetrievalReasoner(
                 dim=args.gt_out_dim * 2,
                 top_k=self.retrieval_top_k,
                 mode=self.retrieval_mode,
-                query_type=self.retrieval_query_type,
+                num_heads=self.retrieval_heads,
+                retrieval_dropout=self.retrieval_dropout,
                 use_gpu=self.retrieval_use_gpu,
             )
 
@@ -101,8 +104,9 @@ class AMNTDDA(nn.Module):
     def _update_retrieval_index(self, dr: torch.Tensor, di: torch.Tensor) -> None:
         if self.retrieval_reasoner is None:
             return
-        self.embedding_bank = torch.cat([dr, di], dim=0)
-        self.retrieval_reasoner.build_index(self.embedding_bank)
+        self.drug_bank = dr
+        self.disease_bank = di
+        self.retrieval_reasoner.build_indexes(self.drug_bank, self.disease_bank)
 
     def update_retrieval_index(self, drdr_graph, didi_graph, drdipr_graph, drug_feature, disease_feature, protein_feature):
         dr, di = self.encode_nodes(drdr_graph, didi_graph, drdipr_graph, drug_feature, disease_feature, protein_feature)
@@ -111,17 +115,26 @@ class AMNTDDA(nn.Module):
     def forward(self, drdr_graph, didi_graph, drdipr_graph, drug_feature, disease_feature, protein_feature, sample):
         dr, di = self.encode_nodes(drdr_graph, didi_graph, drdipr_graph, drug_feature, disease_feature, protein_feature)
 
-        drdi_embedding = torch.mul(dr[sample[:, 0]], di[sample[:, 1]])
+        query_dr = dr[sample[:, 0]]
+        query_di = di[sample[:, 1]]
         retrieval_info = None
 
         if self.retrieval_mode != 'baseline':
-            if self.retrieval_refresh == 'per_forward' or self.embedding_bank is None:
+            if self.retrieval_refresh == 'per_forward' or self.drug_bank is None or self.disease_bank is None:
                 self._update_retrieval_index(dr, di)
 
-            query_dr = dr[sample[:, 0]]
-            query_di = di[sample[:, 1]]
-            context, retrieval_info = self.retrieval_reasoner(query_dr, query_di, self.embedding_bank)
-            drdi_embedding = drdi_embedding + context
+            self.drug_bank = dr
+            self.disease_bank = di
+            query_dr, query_di, retrieval_info = self.retrieval_reasoner(
+                query_dr,
+                query_di,
+                sample[:, 0],
+                sample[:, 1],
+                self.drug_bank,
+                self.disease_bank,
+            )
+
+        drdi_embedding = torch.mul(query_dr, query_di)
 
         output = self.mlp(drdi_embedding)
 

@@ -85,6 +85,14 @@ python train_DDA.py --retrieval_mode full --top_k 5
 python train_DDA.py --retrieval_mode full --top_k 3
 ```
 
+Additional retrieval controls:
+
+- `--retrieval_heads`: number of heads for multi-head retrieval attention.
+- `--retrieval_dropout`: probability of zeroing retrieval context during training.
+- `--index_refresh_epochs`: number of epochs between FAISS index rebuilds.
+- `--lambda_contrastive`: weight for the contrastive retrieval objective.
+- `--use_hard_negatives`: adds nearest unassociated disease negatives during training.
+
 ## Common Configuration Examples
 
 ### Configuration 1: Standard Full Retrieval on C-dataset
