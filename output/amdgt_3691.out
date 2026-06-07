@@ -96,3 +96,30 @@ Running: dataset=F-dataset, mode=retrieval, top_k=5
   warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
 /home/wassime.midi/anaconda3/envs/torch_gpu/lib/python3.10/site-packages/torch/nn/modules/transformer.py:307: UserWarning: enable_nested_tensor is True, but self.use_nested_tensor is False because encoder_layer.self_attn.batch_first was not True(use batch_first for better inference performance)
   warnings.warn(f"enable_nested_tensor is True, but self.use_nested_tensor is False because {why_not_sparsity_fast_path}")
+[master f053e0c] Results from AMDGT training runs - 20260607_125404
+ 7 files changed, 43571 insertions(+), 55 deletions(-)
+ delete mode 100644 output/amdgt_3686.out
+ create mode 100644 output/amdgt_3691.out
+ create mode 100644 output/run_20260606_204448_F-dataset_full_10.log
+ create mode 100644 output/run_20260607_003902_F-dataset_full_5.log
+ create mode 100644 output/run_20260607_043501_F-dataset_retrieval_10.log
+ create mode 100644 output/run_20260607_084512_F-dataset_retrieval_5.log
+ rewrite run_AMDGT.sbatch (73%)
+Missing or invalid credentials.
+Error: connect ECONNREFUSED /run/user/1218/vscode-git-9205892d4d.sock
+    at PipeConnectWrap.afterConnect [as oncomplete] (node:net:1705:16) {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '/run/user/1218/vscode-git-9205892d4d.sock'
+}
+Missing or invalid credentials.
+Error: connect ECONNREFUSED /run/user/1218/vscode-git-9205892d4d.sock
+    at PipeConnectWrap.afterConnect [as oncomplete] (node:net:1705:16) {
+  errno: -111,
+  code: 'ECONNREFUSED',
+  syscall: 'connect',
+  address: '/run/user/1218/vscode-git-9205892d4d.sock'
+}
+remote: No anonymous write access.
+fatal: Authentication failed for 'https://github.com/Wassi00/AMDGT_RAG.git/'
